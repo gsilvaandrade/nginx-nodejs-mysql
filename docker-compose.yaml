@@ -1,0 +1,54 @@
+version: '3'
+
+services: 
+
+  nginx:
+    build: 
+        context: ./nginx
+    image: nginx
+    container_name: nginx
+    networks:
+        - node-network
+    ports:
+        - "80:80"
+    depends_on: 
+        - app
+
+  app:
+    build:
+        context: node
+    container_name: app
+    networks: 
+        - node-network
+    tty: true
+    volumes:
+        - ./node:/usr/src/app
+    ports:
+        - "3000:3000"
+    depends_on:
+        db:
+            condition: service_healthy
+
+  db:
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    #volumes:  -- Remove this comment with you want to save your data
+    #  - ./mysql:/var/lib/mysql -- Remove this comment ....
+    environment: 
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks: 
+      - node-network
+    healthcheck:
+        test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+        timeout: 20s
+        retries: 2
+
+networks: 
+  node-network:
+    driver: bridge      
+      
+    
