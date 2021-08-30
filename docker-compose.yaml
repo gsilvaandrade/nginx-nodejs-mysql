@@ -35,8 +35,8 @@ services:
     container_name: db
     restart: always
     tty: true
-    #volumes:  -- Remove this comment with you want to save your data
-    #  - ./mysql:/var/lib/mysql -- Remove this comment ....
+    volumes:  
+      - ./mysql:/var/lib/mysql 
     environment: 
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
